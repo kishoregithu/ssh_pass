@@ -16,12 +16,7 @@ class runServerCmd:
                          shell=False, 
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
-        result = ' '
-        while True:
-            line = resp.stdout.readline()
-            if not line:
-                break
-            result.join(line.decode("utf-8"))
+        result, err = resp.communicate()
         return result
     
     def exec_cmd2(self, cmd):

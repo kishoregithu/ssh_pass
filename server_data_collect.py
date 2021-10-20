@@ -37,7 +37,7 @@ class runServerCmd:
             logging.info(err.decode('utf-8'))
             raise SSHCommandExecError
             
-        return result
+        return result.decode('utf-8')
     
     def exec_cmd2(self, cmd):
         import os

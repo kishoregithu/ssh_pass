@@ -33,7 +33,7 @@ class runServerCmd:
                          stderr=subprocess.PIPE)
         result, err = resp.communicate()
         
-        if err:
+        if err and 'Warning' not in err:
             logging.info(err.decode('utf-8'))
             raise SSHCommandExecError
             

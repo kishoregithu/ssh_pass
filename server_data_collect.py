@@ -2,8 +2,23 @@
 import subprocess
 import csv
 import argparse
+import logging
+
+logging.basicConfig(filename='server_data_collect.log',
+                            filemode='a',
+                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                            datefmt='%H:%M:%S',
+                            level=logging.DEBUG)
 
 field_names = ['SERVER','APPID','CRONJOB','RPM']
+
+class Error(Exception):
+    """Base class for other exceptions"""
+    pass
+
+class SSHCommandExecError(Error):
+    """Raised when the Command Execution Fails over SSH"""
+    pass
 
 class runServerCmd:
     
@@ -17,6 +32,11 @@ class runServerCmd:
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
         result, err = resp.communicate()
+        
+        if err:
+            logging.info(err.decode('utf-8'))
+            raise SSHCommandExecError
+            
         return result
     
     def exec_cmd2(self, cmd):
@@ -35,6 +55,11 @@ class serverDataCollect:
     def run(self):
         apps = ["tini","tini"]
         self.result["SERVER"] = self.hostname
+        
+        try:
+            self.runcommand.exec_cmd('ls')
+        except SSHCommandExecError:
+            return
         
         #check process on appid 
         self.result["APPID"] = ''

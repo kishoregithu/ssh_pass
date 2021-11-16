@@ -10,28 +10,6 @@ logging.basicConfig(filename='server_data_collect.log',
                             datefmt='%H:%M:%S',
                             level=logging.DEBUG)
 
-data = dict(
-    hostname = '',
-    error_data = dict(
-        host = '',
-        folder = '',
-        pattern = '',
-    )
-)
-
-def populate_dict(hostname="nap", host= "mspfwd1", folder="/tmp", pattern="abc"):
-    temp = data
-    temp['hostname'] = hostname
-    temp['error_data']["host"] = host
-    temp['error_data']["folder"] = folder
-    temp['error_data']["pattern"] = pattern
-    return temp
-
-
-
-LOGPATH = "/var/log/temp"
-PATTERN = "ERROR"
-
 class Error(Exception):
     """Base class for other exceptions"""
     pass
@@ -40,12 +18,9 @@ class SSHCommandExecError(Error):
     """Raised when the Command Execution Fails over SSH"""
     pass
 
-
 class runServerCmd:
-    
-    def __init__(self, host, user):
+    def __init__(self, host):
         self.host = host
-        self.user = user
         
     def exec_cmd(self, cmd):
         resp = subprocess.Popen(["ssh", "%s" % self.host, cmd], 
@@ -59,11 +34,12 @@ class runServerCmd:
         return result.decode('utf-8')
 
 class serverlogCollect:
-    def __init__(self, username, hostname, errfile ):
-        self.hostname = hostname
-        self.username = username
-        self.errorfile = errfile
-        self.runcommand = runServerCmd(self.hostname,self.username)
+    def __init__(self, host, string, sdir, outfile):
+        self.host = host
+        self.outfile = outfile
+        self.sdir = sdir
+        self.string = string
+        self.runcommand = runServerCmd(self.host)
         self.result = {}
         
     def run(self):
@@ -72,32 +48,31 @@ class serverlogCollect:
         except SSHCommandExecError:
             return
         # command to grep 
-        cmd = "cat "+ LOGPATH +  " | grep " + PATTERN
+        cmd = "grep " + self.string + " " + self.sdir
         resp = ' ' + self.runcommand.exec_cmd(cmd)
         if resp:
-            data = populate_dict("",self.hostname, LOGPATH, PATTERN)
-            with open(self.errorfile, 'a') as outfile:
-                yaml.dump(data, outfile, default_flow_style=False)
+            with open(self.outfile, 'a') as outfile:
+                outfile.write(self.host)
+                outfile.write(resp)
         
         
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("-s", "--servers", required=True, help="Server list file")
-    ap.add_argument("-u", "--username", required=True, help="name of user")
-    ap.add_argument("-y", "--errorfile", required=True, help="yaml filr for save log")
+    ap.add_argument("-y", "--yamlfile", required=True, help="yaml file input")
+    ap.add_argument("-o", "--outputfile", required=True, help="output file")
     args = vars(ap.parse_args())
             
     #print(args['servers'], args['username'])
-    host_list = []
-    with open(args['servers']) as slf:
-        while True:
-            line = slf.readline()
-            if not line:
-                break
-            host_list.append(line.strip())
+    with open(args['yamlfile'], "r") as stream:
+        try:
+            data = yaml.safe_load(stream)
+            for item in data:
+                for i in data[item]:
+                    slc = serverlogCollect(i['host'], i['string'], i['dir'],args['yamlfile'])
+                    slc.run()
+        except yaml.YAMLError as exc:
+            print(exc)
     
-    for host in host_list:
-        sdc = serverlogCollect(args['username'],host,args['errorfile'])
-        sdc.run()
+    
     #print(host_list)
     

@@ -51,6 +51,7 @@ class serverlogCollect:
             return
         # command to grep 
         # command to grep 
+        resp = ''
         cmd = "grep -m1 " + self.string + " " + self.sdir 
         resp += ' ' + self.runcommand.exec_cmd(cmd) 
         self.result["Log"] = resp 

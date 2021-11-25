@@ -64,7 +64,7 @@ class serverlogCollect:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("-y", "--yamlfile", required=True, help="yaml file input")
-    ap.add_argument("-l", "--logfilepath", required=True, help="log file", default="/var/log/mspfwd.log")
+    ap.add_argument("-l", "--logfilepath", required=False, help="log file", default="/var/log/mspfwd.log")
     args = vars(ap.parse_args())
             
     #print(args['servers'], args['username'])

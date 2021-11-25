@@ -10,6 +10,8 @@ logging.basicConfig(filename='server_data_collect.log',
                             datefmt='%H:%M:%S',
                             level=logging.DEBUG)
 
+EMAIL_STR = ''
+
 class Error(Exception):
     """Base class for other exceptions"""
     pass
@@ -28,7 +30,7 @@ class runServerCmd:
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
         result, err = resp.communicate()
-        if err:
+        if err and 'Warning' not in err.decode('utf-8'):
             logging.info(err.decode('utf-8'))
             raise SSHCommandExecError
         return result.decode('utf-8')
@@ -48,18 +50,22 @@ class serverlogCollect:
         except SSHCommandExecError:
             return
         # command to grep 
-        cmd = "grep " + self.string + " " + self.sdir
-        resp = ' ' + self.runcommand.exec_cmd(cmd)
+        # command to grep 
+        cmd = "grep -m1 " + self.string + " " + self.sdir 
+        resp += ' ' + self.runcommand.exec_cmd(cmd) 
+        self.result["Log"] = resp 
+        cmd = "grep " + self.string + " " + self.sdir + "| wc -l" 
+        resp += ' ' + self.runcommand.exec_cmd(cmd) 
+        self.result["Count"] = resp
         if resp:
-            with open(self.outfile, 'a') as outfile:
-                outfile.write(self.host)
-                outfile.write(resp)
+            EMAIL_STR += resp + '\n'
         
         
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("-y", "--yamlfile", required=True, help="yaml file input")
     ap.add_argument("-o", "--outputfile", required=True, help="output file")
+    ap.add_argument("-l", "--logfilepath", required=True, help="log file", default="/var/log/mspfwd.log")
     args = vars(ap.parse_args())
             
     #print(args['servers'], args['username'])
@@ -68,11 +74,14 @@ if __name__ == "__main__":
             data = yaml.safe_load(stream)
             for item in data:
                 for i in data[item]:
-                    slc = serverlogCollect(i['host'], i['string'], i['dir'],args['yamlfile'])
+                    slc = serverlogCollect(i['host'], i['string'], args['logfilepath'],args['yamlfile'])
                     slc.run()
         except yaml.YAMLError as exc:
             print(exc)
-    
+            
+    cmd="""echo """+ EMAIL_STR +"""  | mailx -s 'Error Detail' sk3798@att.com""" 
+    p=subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE) 
+    output, errors = p.communicate()
     
     #print(host_list)
     

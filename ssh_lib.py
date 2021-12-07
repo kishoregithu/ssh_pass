@@ -211,3 +211,7 @@ class SSHsession():
         except paramiko.SSHException as e:
             #print "paramiko exit failed..."
             log.info (str(e))
+            
+if __name__ == "__main__":
+    ss = SSHsession(hostname='',keyfile='')
+    print(ss.send_cmd())

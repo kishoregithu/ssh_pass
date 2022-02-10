@@ -74,10 +74,20 @@ class serverlogCollect:
         global EMAIL_STR
         global haszero
         resp = ' ' 
-        cmd = " grep -m1 " + '"' + self.string + '"' + " " + self.sdir 
-        resp += ' ' + self.runcommand.exec_cmd(cmd) 
-        cmd = "  grep " + '"' +  self.string + '"' +  " " + self.sdir + "| wc -l" 
-        resp += ' ' + self.runcommand.exec_cmd(cmd) 
+        if ',' in self.sdir:
+            logs = self.sdir.split(',')
+            for item in logs:
+                cmd = " grep -m1 " + '"' + self.string + '"' + " " + item 
+                resp += ' ' + self.runcommand.exec_cmd(cmd) 
+                cmd = "  grep " + '"' +  self.string + '"' +  " " + item + "| wc -l" 
+                resp += ' ' + self.runcommand.exec_cmd(cmd) 
+                resp += '\n'
+        else:
+            cmd = " grep -m1 " + '"' + self.string + '"' + " " + self.sdir 
+            resp += ' ' + self.runcommand.exec_cmd(cmd) 
+            cmd = "  grep " + '"' +  self.string + '"' +  " " + self.sdir + "| wc -l" 
+            resp += ' ' + self.runcommand.exec_cmd(cmd)
+            resp += '\n'
         if resp:
             EMAIL_STR += self.host + resp + '\n'
             if ((len(str(resp).strip())) > 1):

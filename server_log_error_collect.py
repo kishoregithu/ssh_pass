@@ -118,8 +118,9 @@ class serverlogCollect:
                 resp += '\t' + '"Count:"' + self.runcommand.exec_cmd(cmd)
             resp += '\n'
         if resp and ((len(str(resp).strip())) > 72):
+              EMAIL_STR += resp
               if ((len(str(LOG).strip())) > 25):
-                  EMAIL_STR += resp + LOG
+                  EMAIL_STR += LOG
             
                     
 
@@ -133,7 +134,6 @@ if __name__ == "__main__":
     we have a default logpath set to "/var/log/mspfwd.log,/var/log/message". If user want to change the location we can use     -l as argument while running.
     It will pull host, string and email details from yaml file as input and it will ssh to host and pull error log     information.
     If we receive any String error log or ssh connection log, we will send and email to users specifeid in the yaml file."""
-    global EMAIL_STR
     with open(args['yamlfile'], "r") as stream:
         try:
             data = yaml.safe_load(stream)
@@ -147,4 +147,5 @@ if __name__ == "__main__":
         except yaml.YAMLError as exc:
             print(exc)
     with open('/opt/bsa/bin/log_analyser.log','w') as lg_file:
+        global EMAIL_STR
         lg_file.write(EMAIL_STR)

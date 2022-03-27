@@ -25,7 +25,6 @@ logging.basicConfig(filename='/opt/bsa/log/log_analyzer.log',
                             level=logging.DEBUG)
 
 EMAIL_STR = ''
-LOG = ''
 Email = ''
 
 class Error(Exception):
@@ -64,8 +63,10 @@ class runServerCmd:
                          stderr=subprocess.PIPE)
         result, err = resp.communicate()
         if err and 'warning' not in err:
-            global LOG
-            LOG += "ERROR LOG: " + err.replace('\r', '') + '\n'
+            global EMAIL_STR
+            LOG = "ERROR LOG: " + err.replace('\r', '') + '\n'
+            if ((len(str(LOG).strip())) > 25):
+                EMAIL_STR += LOG
             logging.error(err)
             raise SSHCommandExecError
         return result
@@ -118,12 +119,8 @@ class serverlogCollect:
                 resp += '\t' + '"Count:"' + self.runcommand.exec_cmd(cmd)
             resp += '\n'
         if resp and ((len(str(resp).strip())) > 72):
-              EMAIL_STR += resp
-              if ((len(str(LOG).strip())) > 25):
-                  EMAIL_STR += LOG
-            
-                    
-
+            EMAIL_STR += resp
+              
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--yamlfile", required=True, help="yaml file input")

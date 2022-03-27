@@ -146,5 +146,5 @@ if __name__ == "__main__":
                         slc.run()
         except yaml.YAMLError as exc:
             print(exc)
-     with open('/opt/bsa/bin/log_analyser.log','w') as lg_file:
-         lg_file.write(EMAIL_STR)
+    with open('/opt/bsa/bin/log_analyser.log','w') as lg_file:
+        lg_file.write(EMAIL_STR)

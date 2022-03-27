@@ -26,14 +26,9 @@ logging.basicConfig(filename='/opt/bsa/log/log_analyzer.log',
 
 EMAIL_STR = ''
 LOG = ''
-VAR = ''
 haszero = False
 Email = ''
 rcode = ''
-SUB = ''
-Body = ''
-NTC = ''
-hostname = ''
 
 
 class Error(Exception):
@@ -99,15 +94,8 @@ class serverlogCollect:
         self.runcommand = runServerCmd(self.host)
         self.result = {}
         global Email
-        global SUB
-        global Body
-        global NTC
-        global hostname
+        global err
         Email =  ",".join(self.email)
-        hostname = socket.gethostname().split(".",1)[-2]
-        NTC = hostname.split("-",1)[-1]
-        SUB = 'BSA error log report for: ' + NTC
-        Body = 'Report generated from the VM: ' + hostname + '\n'
 
     def run(self):
         try:
@@ -116,7 +104,7 @@ class serverlogCollect:
             return
         global EMAIL_STR
         global VAR
-        global haszero
+        global LOG
         resp = ' '
         if ',' in self.sdir:
             logs = self.sdir.split(',')
@@ -128,7 +116,7 @@ class serverlogCollect:
                         resp += self.host + '\t' + item + '\t ' + resp1
                         cmd = "grep -i " + '"' +  self.string + '"' +  " " + item + "| wc -l"
                         resp += '\t' + '"Count:"' + self.runcommand.exec_cmd(cmd)
-            resp += '\n'
+                        resp += '\n'
         else:
             cmd = " grep -m1 " + '"' + self.string + '"' + " " + self.sdir
             resp1=self.runcommand.exec_cmd(cmd)
@@ -138,11 +126,12 @@ class serverlogCollect:
                 resp += '\t' + '"Count:"' + self.runcommand.exec_cmd(cmd)
             resp += '\n'
         if resp:
+            EMAIL_STR += resp 
             with open('/opt/bsa/bin/log_analyser.log','w') as lg_file:
                 if ((len(str(resp).strip())) > 72):
                     if ((len(str(LOG).strip())) > 25):
-                        resp += LOG
-                    lg_file.write(resp)
+                       EMAIL_STR += LOG
+                    lg_file.write(EMAIL_STR)
                     
 
 if __name__ == "__main__":

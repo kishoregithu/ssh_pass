@@ -26,10 +26,7 @@ logging.basicConfig(filename='/opt/bsa/log/log_analyzer.log',
 
 EMAIL_STR = ''
 LOG = ''
-haszero = False
 Email = ''
-rcode = ''
-
 
 class Error(Exception):
     """Base class for other exceptions"""
@@ -66,8 +63,6 @@ class runServerCmd:
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
         result, err = resp.communicate()
-        global rcode
-        rcode = resp.returncode
         if err and 'warning' not in err:
             global LOG
             LOG += "ERROR LOG: " + err.replace('\r', '') + '\n'
@@ -94,7 +89,6 @@ class serverlogCollect:
         self.runcommand = runServerCmd(self.host)
         self.result = {}
         global Email
-        global err
         Email =  ",".join(self.email)
 
     def run(self):
@@ -103,20 +97,18 @@ class serverlogCollect:
         except SSHCommandExecError:
             return
         global EMAIL_STR
-        global VAR
         global LOG
         resp = ' '
         if ',' in self.sdir:
             logs = self.sdir.split(',')
             for item in logs:
                 cmd = " grep -m1 " + '"' + self.string + '"' + " " + item
-                if rcode == 0:
-                    resp1=self.runcommand.exec_cmd(cmd).strip()
-                    if resp1:
-                        resp += self.host + '\t' + item + '\t ' + resp1
-                        cmd = "grep -i " + '"' +  self.string + '"' +  " " + item + "| wc -l"
-                        resp += '\t' + '"Count:"' + self.runcommand.exec_cmd(cmd)
-                        resp += '\n'
+                resp1=self.runcommand.exec_cmd(cmd).strip()
+                if resp1:
+                    resp += self.host + '\t' + item + '\t ' + resp1
+                    cmd = "grep -i " + '"' +  self.string + '"' +  " " + item + "| wc -l"
+                    resp += '\t' + '"Count:"' + self.runcommand.exec_cmd(cmd)
+                    resp += '\n'
         else:
             cmd = " grep -m1 " + '"' + self.string + '"' + " " + self.sdir
             resp1=self.runcommand.exec_cmd(cmd)
@@ -125,13 +117,10 @@ class serverlogCollect:
                 cmd = "grep -i " + '"' +  self.string + '"' +  " " + self.sdir + "| wc -l"
                 resp += '\t' + '"Count:"' + self.runcommand.exec_cmd(cmd)
             resp += '\n'
-        if resp:
-            EMAIL_STR += resp 
-            with open('/opt/bsa/bin/log_analyser.log','w') as lg_file:
-                if ((len(str(resp).strip())) > 72):
-                    if ((len(str(LOG).strip())) > 25):
-                       EMAIL_STR += LOG
-                    lg_file.write(EMAIL_STR)
+        if resp and ((len(str(resp).strip())) > 72):
+              if ((len(str(LOG).strip())) > 25):
+                  EMAIL_STR += resp + LOG
+            
                     
 
 if __name__ == "__main__":
@@ -144,7 +133,7 @@ if __name__ == "__main__":
     we have a default logpath set to "/var/log/mspfwd.log,/var/log/message". If user want to change the location we can use     -l as argument while running.
     It will pull host, string and email details from yaml file as input and it will ssh to host and pull error log     information.
     If we receive any String error log or ssh connection log, we will send and email to users specifeid in the yaml file."""
-
+    global EMAIL_STR
     with open(args['yamlfile'], "r") as stream:
         try:
             data = yaml.safe_load(stream)
@@ -155,5 +144,7 @@ if __name__ == "__main__":
                     ip = get_ip_address('eth0:1')
                     if ip is not None:
                         slc.run()
-        except yaml.YAMLError as exc:
-            print(exc)
+         except yaml.YAMLError as exc:
+             print(exc)
+     with open('/opt/bsa/bin/log_analyser.log','w') as lg_file:
+         lg_file.write(EMAIL_STR)

@@ -144,7 +144,7 @@ if __name__ == "__main__":
                     ip = get_ip_address('eth0:1')
                     if ip is not None:
                         slc.run()
-         except yaml.YAMLError as exc:
-             print(exc)
+        except yaml.YAMLError as exc:
+            print(exc)
      with open('/opt/bsa/bin/log_analyser.log','w') as lg_file:
          lg_file.write(EMAIL_STR)

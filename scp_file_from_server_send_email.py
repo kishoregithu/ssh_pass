@@ -8,8 +8,7 @@ from datetime import datetime
 
 config = {
             'subject_line' : 'Test',
-            'sender' : '',
-            'receivers' : ''
+            'sender' : ''
          }
 
 class HtmlFormatter(object):
@@ -89,10 +88,10 @@ div.WordSection1
         self.write('<p>%s</p>\n' % line)
         
 
-def send_email(body):
-    subject_line = config['subject_line'].format(loc.upper())
+def send_email(body,recvrs):
+    subject_line = config['subject_line']
     sender = config['sender']
-    receivers = config['receivers']
+    receivers = recvrs
     if isinstance(receivers, list):
         receivers = ', '.join(receivers)
 
@@ -131,7 +130,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--yamlfile", required=True, help="yaml file input")
     ap.add_argument("-l", "--logfilepath", required=False, help="log file",
-                    default="/var/log/mspfwd.log,/var/log/messages")
+                    default="/opt/bin/gen_file.txt")
     args = vars(ap.parse_args())
     body = HtmlFormatter()
     body.write_line( 'Report of Log Analysis')
@@ -141,13 +140,11 @@ if __name__ == "__main__":
             for item in data:
                 if 'email' in item:break
                 for i in data[item]:
-                    ip = get_ip_address('eth0:1')
-                    if ip is not None:
-                        local_file_name = "./{}.log".format(i['host'])
-                        remote_file_name = '/opt/bin/gen_file.txt'
-                        copy_file(SERVER=i['host'],PATH = remote_file_name ,FILE =local_file_name)
-                        if os.path.isfile(local_file_name):
-                            process_file(local_file_name,body)
+                    local_file_name = "./{}.log".format(i['host'])
+                    remote_file_name = args['logfilepath']
+                    copy_file(SERVER=i['host'],PATH = remote_file_name ,FILE =local_file_name)
+                    if os.path.isfile(local_file_name):
+                        process_file(local_file_name,body)
         except yaml.YAMLError as exc:
             print(exc)
-    send_email(body)
+        send_email(body,data['receivers'])

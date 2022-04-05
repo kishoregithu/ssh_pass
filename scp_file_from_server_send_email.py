@@ -9,7 +9,16 @@ from datetime import datetime
 config = {
             'subject_line' : 'Test',
             'sender' : ''
+            'receivers' : ''
          }
+errored_servers = []
+servers_list = []
+location_list = []
+error_count = {}
+formatted_line_list = []
+html_str = '<span style="color:blue">{}</span> <span style="color:green">{}</span> '
+html_str_hdr = '<span style="color:blue">{}</span> : <span style="color:green">{}</span> : <span style="color:green">{}</span> '
+html_str_err = '<span style="color:red">{}</span>'
 
 class HtmlFormatter(object):
     def __init__(self):
@@ -88,13 +97,26 @@ div.WordSection1
         self.write('<p>%s</p>\n' % line)
         
 
-def send_email(body,recvrs):
-    subject_line = config['subject_line']
+def send_email(body):
+    subject_line = config['subject_line'].format(loc.upper())
     sender = config['sender']
-    receivers = recvrs
+    receivers = config['receivers']
     if isinstance(receivers, list):
         receivers = ', '.join(receivers)
-
+    
+    body.write_line("SUMMARY" )
+    
+    for location in location_list:
+    for server in servers_list:
+        ftd_line = html_str_hdr.format(location,server,str(error_count[server]))
+        body.write_line(ftd_line + '\n')
+    body.write_line(html_str_err.format('Connect_failed_list_servers:' + ','.join(errored_servers)))
+    
+    body.write_line("DETAILS" )
+    
+    for fmtd_line in formatted_line_list:           
+        body.write_line(fmtd_line + '\n')
+        
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject_line
     msg['From'] = sender
@@ -113,18 +135,23 @@ def copy_file(USER = 'bsa',SERVER = '',PATH = '',FILE = ''):
                              stderr=subprocess.PIPE)
     result, err = resp.communicate()
 
-def process_file(filename,body):
-    html_str = '<span style="color:blue">{}</span> <span style="color:green">{}</span> '
-    html_str_err = '<span style="color:red">{}</span>'
+def process_file(filename = 'gen_file.log'):
     with open(filename,"r") as inputfile:
+        location_list.append(filename.split('.')[0])
         for line in inputfile:
             if len(line) != 1:
                 llist = line.strip().split()
                 if 'ERROR' in llist[0]:
                     formatted_line = html_str_err.format(line)
+                    errored_servers.append(line.split()[7])
                 else:
                     formatted_line = html_str.format(llist[0], llist[1]) + ' '.join(llist[2:])
-                body.write_line(formatted_line + '\n')
+                    if llist[0] not in servers_list :
+                        servers_list.append(llist[0])
+                        error_count[llist[0]] = 1
+                    else:
+                        error_count[llist[0]] += 1
+                formatted_line_list.append(formatted_line )
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
@@ -144,7 +171,7 @@ if __name__ == "__main__":
                     remote_file_name = args['logfilepath']
                     copy_file(SERVER=i['host'],PATH = remote_file_name ,FILE =local_file_name)
                     if os.path.isfile(local_file_name):
-                        process_file(local_file_name,body)
+                        process_file(local_file_name)
         except yaml.YAMLError as exc:
             print(exc)
         send_email(body,data['receivers'])

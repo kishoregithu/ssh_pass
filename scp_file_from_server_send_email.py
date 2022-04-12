@@ -18,7 +18,8 @@ error_count = {}
 formatted_line_list = []
 html_str = '<span style="color:blue">{}</span> <span style="color:green">{}</span> '
 html_str_hdr = '<span style="color:blue">{}</span> : <span style="color:green">{}</span> : <span style="color:green">{}</span> '
-html_str_err = '<span style="color:red">{}</span>'
+html_str_err = '<span style="color:yellow">{}</span>'
+html_str_fat = '<span style="color:red">{}</span>'
 
 class HtmlFormatter(object):
     def __init__(self):
@@ -145,7 +146,12 @@ def process_file(filename = 'gen_file.log'):
                     formatted_line = html_str_err.format(line)
                     errored_servers.append(line.split()[7])
                 else:
-                    formatted_line = html_str.format(llist[0], llist[1]) + ' '.join(llist[2:])
+                    rest_line = ' '.join(llist[2:])
+                    if 'ERROR' in rest_line:
+                        rest_line = html_str_err.format(rest_line)
+                    elif 'FATAL' in rest_line:
+                        rest_line = html_str_fat.format(rest_line)
+                    formatted_line = html_str.format(llist[0], llist[1]) + rest_line
                     if llist[0] not in servers_list :
                         servers_list.append(llist[0])
                         error_count[llist[0]] = 1

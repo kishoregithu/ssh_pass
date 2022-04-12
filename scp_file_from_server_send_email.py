@@ -108,9 +108,11 @@ def send_email(body):
     body.write_line("SUMMARY" )
     
     for location in location_list:
-    for server in servers_list:
-        ftd_line = html_str_hdr.format(location,server,str(error_count[server]))
-        body.write_line(ftd_line + '\n')
+        body.write_line("<br>")
+        for server in servers_list:
+            ftd_line = html_str_hdr.format(location,server,str(error_count[server]))
+            body.write_line(ftd_line + '\n')
+            
     body.write_line(html_str_err.format('Connect_failed_list_servers:' + ','.join(errored_servers)))
     
     body.write_line("DETAILS" )
@@ -137,6 +139,7 @@ def copy_file(USER = 'bsa',SERVER = '',PATH = '',FILE = ''):
     result, err = resp.communicate()
 
 def process_file(filename = 'gen_file.log'):
+    formatted_line_list.append('<br>' )
     with open(filename,"r") as inputfile:
         location_list.append(filename.split('.')[0])
         for line in inputfile:
@@ -146,7 +149,7 @@ def process_file(filename = 'gen_file.log'):
                     formatted_line = html_str_err.format(line)
                     errored_servers.append(line.split()[7])
                 else:
-                    rest_line = ' '.join(llist[2:])
+                    rest_line = ' '.join(llist[2:len(llist)-1]) + "<strong>{}</strong>".format(llist[-1])
                     if 'ERROR' in rest_line:
                         rest_line = html_str_err.format(rest_line)
                     elif 'FATAL' in rest_line:

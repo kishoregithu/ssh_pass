@@ -110,8 +110,9 @@ def send_email(body):
     for location in location_list:
         body.write_line("<br>")
         for server in servers_list:
-            ftd_line = html_str_hdr.format(location,server,str(error_count[server]))
-            body.write_line(ftd_line + '\n')
+            if location in server:
+                ftd_line = html_str_hdr.format(location,server,str(error_count[server]))
+                body.write_line(ftd_line + '\n')
             
     body.write_line(html_str_err.format('Connect_failed_list_servers:' + ','.join(errored_servers)))
     

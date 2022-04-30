@@ -107,12 +107,31 @@ def send_email(body):
     
     body.write_line("SUMMARY" )
     
+    location_list.sort()
+    def get_html_count(sname):
+        nvms = 0
+        ecnt = 0
+        for item  in error_count.keys():
+            if sname in item:
+                nvms += 1
+                ecnt += error_count[item]
+        return "{} ({} VMs) : {}".format(sname,nvms,ecnt)
+    snames = []
+    for server_name in servers_list:
+        snames.append(server_name.split('-')[0][:-1])
+    snames = list(set(snames))
+    snames.sort()
+    flag = False
     for location in location_list:
-        body.write_line("<br>")
-        for server in servers_list:
-            if location in server:
-                ftd_line = html_str_hdr.format(location,server,str(error_count[server]))
-                body.write_line(ftd_line + '\n')
+        loc = location
+        flag = False
+        for sname in snames:
+            ftd_line = html_str_summary.format(loc,get_html_count(sname))
+            body.write_line(ftd_line)
+            flag = True
+            if flag :
+                loc = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        body.write_line('<br>')
             
     body.write_line(html_str_err.format('Connect_failed_list_servers:' + ','.join(errored_servers)))
     

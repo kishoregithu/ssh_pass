@@ -20,6 +20,7 @@ html_str = '<span style="color:blue">{}</span> <span style="color:green">{}</spa
 html_str_hdr = '<span style="color:blue">{}</span> : <span style="color:green">{}</span> : <span style="color:green">{}</span> '
 html_str_err = '<span style="color:yellow">{}</span>'
 html_str_fat = '<span style="color:red">{}</span>'
+html_str_summary = '<span style="color:blue">{}</span> : <span style="color:green">{}</span> '
 
 class HtmlFormatter(object):
     def __init__(self):

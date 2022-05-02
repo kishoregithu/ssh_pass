@@ -119,16 +119,18 @@ def send_email(body):
         return "{} ({} VMs) : {}".format(sname,nvms,ecnt)
     snames = []
     for server_name in servers_list:
-        snames.append(server_name.split('-')[0][:-1])
-    snames = list(set(snames))
-    snames.sort()
+        sname = {}
+        sname['server'] =  server_name.split('-')[0][:-1]
+        sname['loc'] = server_name.split('-')[0][1]
+        snames.append(sname)
     flag = False
     for location in location_list:
         loc = location
         flag = False
+        added = []
         for sname in snames:
-            if location in sname:
-                ftd_line = html_str_summary.format(loc,get_html_count(sname))
+            if sname['server'] not in added and sname['loc'] == location:
+                ftd_line = html_str_summary.format(loc,get_html_count(sname['server']))
                 body.write_line(ftd_line)
                 flag = True
                 if flag :

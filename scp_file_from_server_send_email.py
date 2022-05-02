@@ -127,11 +127,12 @@ def send_email(body):
         loc = location
         flag = False
         for sname in snames:
-            ftd_line = html_str_summary.format(loc,get_html_count(sname))
-            body.write_line(ftd_line)
-            flag = True
-            if flag :
-                loc = "&nbsp;&nbsp;&nbsp;&nbsp;"
+            if location in sname:
+                ftd_line = html_str_summary.format(loc,get_html_count(sname))
+                body.write_line(ftd_line)
+                flag = True
+                if flag :
+                    loc = "&nbsp;&nbsp;&nbsp;&nbsp;"
         body.write_line('<br>')
             
     body.write_line(html_str_err.format('Connect_failed_list_servers:' + ','.join(errored_servers)))

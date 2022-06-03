@@ -81,7 +81,7 @@ def main():
                         user_ops.user_add_sudo(user_dict['name'])
 
                     #verify whether user exists
-                    user_ops.user_verify("jovyan")) #user_dict['name'])
+                    user_ops.user_verify(user_dict['name'])
 
                     #add SSH authorized key
                     for item in user_dict['key']:

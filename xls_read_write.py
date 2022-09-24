@@ -2,7 +2,7 @@ import xlrd
 import xlwt
 wb = xlrd.open_workbook('MONTHLY SHIPMENT LOG TEMPLATE.xls')
 book = xlwt.Workbook()
-sheet1 = book.add_sheet('Sheet 1')
+sheet1 = book.add_sheet('CURRENT')
 sh = wb.sheet_by_index(0)
 
 col_values = sh.col_values(1)

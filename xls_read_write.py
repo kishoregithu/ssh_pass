@@ -25,7 +25,7 @@ for j,k in enumerate(col_values):
                         sheet1.write(j, m , i , style)
                     else:
                         sheet1.write(j, m , i )
-     else:
+    else:
         for m,i in enumerate(row_values): 
             sheet1.write(j, m , i )
 book.save('test.xls')

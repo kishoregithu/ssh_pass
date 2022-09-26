@@ -11,7 +11,7 @@ group_list = {
     'mbs':[ 'BTR', '', '', 'SBA'],
     'alt_a':[ 'ZBT', '', 'ZM2', 'ZSB']
 }
-col_values = sh.col_values(1)
+col_values = sh.col_values(0)
 #col_values = col_values[1:len(col_values)] 
 for j,k in enumerate(col_values):
     row_values = sh.row_values(j)

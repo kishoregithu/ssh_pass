@@ -1,5 +1,6 @@
-@@@@@@@@@@@@PowerShell_Cheat_Sheet.txt@@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@@@@@@@@@@@@PowerShell Scripting Cheat Sheet@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 1. Execute a file
 =================
 powershell -command test.ps1
@@ -161,4 +162,29 @@ $hash.Count
 write-host("sort by key")
 $hash.GetEnumerator() | Sort-Object -Property key
 
+13. Functions
+=============
+function foo($a, $b, $c) {
+   write-host("a: $a; b: $b; c: $c")
+}
+foo 1 2 3
 
+14. Exception Handling
+======================
+function Start-Something
+{
+    throw "Bad thing happened"
+}
+try
+{
+    Start-Something
+}
+catch
+{
+    Write-Output "Something threw an exception"
+    Write-Output $_
+}
+
+15. Import another PS1 file
+===========================
+. c:\scripts.sample.ps1

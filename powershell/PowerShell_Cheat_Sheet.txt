@@ -1,0 +1,164 @@
+@@@@@@@@@@@@PowerShell_Cheat_Sheet.txt@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+1. Execute a file
+=================
+powershell -command test.ps1
+
+2. Some Commands
+================
+Get-Help
+New-Item -Path 'D:\temp\Test Folder' -ItemType Directory/File  #Create a Directory/File
+Copy-Item <path_src> <path_dest>
+Remove-Item
+Move-Item
+(Get-Content D:\temp\test\test.txt).length
+Test-Path D:\temp\test\test.txt
+
+3. Create a File, Edit, and retrive
+==================================
+New-Item D:\temp\test\test.txt
+Set-Content D:\temp\test\test.txt 'Welcome to TutorialsPoint'
+get-Content D:\temp\test\test.txt
+Add-Content D:\temp\test\test.txt 'World!'
+Clear-Content D:\temp\test\test.txt
+
+4. Create a list and sort
+=========================
+$list = "one","two","two","three","four","five"
+$list | sort | get-unique  # Get items from the sorted list
+
+5. For each
+===========
+1000,2000,3000 | ForEach-Object -Process {$_/1000}
+"Microsoft.PowerShell.Core", "Microsoft.PowerShell.Host" | ForEach-Object {$_.Split(".")}   # Splits each item  in list of strings 
+
+6. Other useful cmdlet
+======================
+Get-Service | Where-Object {$_.Status -eq "Stopped"}
+$location = Get-Location
+$location | Get-Member
+$location.ToString()
+$location.GetType()
+get-content D:\temp\test\test.txt | measure-object -character -line -word
+Get-ChildItem | Measure-Object   #no. of files present in current directory
+
+7. Arithemetic Operators
+========================
+> $a = 10
+> $b = 20
+> $c = 25
+> $d = 25
+> $a + $b
+ 30
+> $a - $b
+ -10
+> $a * $b
+ 200
+> $b / $a
+ 2
+> $c % $a
+ 5
+
+8. Comparison Operators
+=======================
+> $a = 10
+> $b = 20
+> $a -eq $b
+ False 
+> $a -ne $b
+ True
+> $b -gt $a
+ True
+> $b -ge $a
+ True
+> $b -lt $a
+ False
+> $b -le $a
+ False
+> $a = "mahesh"
+> $b = "suresh"
+> $a -like '*ahe*'
+ True
+> $a -notLike '*ahe*'
+ True
+> $b -match '[h$]'
+ True
+> $b -notMatch '[h$]'
+ False
+> $a = 'abc'
+> $b = 'abc'
+> $b -contains $a
+ True
+> $b -notContains $a
+ False
+ 
+9. Other Operators
+==================
+=, +=, -=, AND, OR, NOT
+dir > test.log
+
+10. Loop 
+========
+a. For
+$array = @("item1", "item2", "item3")
+for($i = 0; $i -lt $array.length; $i++){ $array[$i] }
+item1
+item2
+item3
+
+foreach ($element in $array) { $element } # Same as above
+$array | foreach { $_ } # Same as above
+
+b. While
+$counter = 0;
+while($counter -lt $array.length){
+   $array[$counter]
+   $counter += 1
+}
+OR
+$counter = 0;
+do {
+   $array[$counter]
+   $counter += 1
+} while($counter -lt $array.length)
+
+11. Condition
+=============
+$x = 30
+$y = 10
+if($x -le 20){
+   if($y -eq 10) {
+      write-host("X = 30 and Y = 10")
+   }
+   write-host("This is if statement")
+}else {
+   write-host("This is else statement")
+}
+switch(3){
+   1 {"One"}
+   2 {"Two"}
+   3 {"Three"}
+   4 {"Four"}
+   3 {"Three Again"}
+}
+
+12. Dictionary / Hash Table
+===========================
+$hash = [ordered]@{ ID = 1; Shape = "Square"; Color = "Blue"}
+foreach ($element in $hash.values) { $element }
+write-host("print Size")
+$hash.Count
+write-host("Add key-value")
+$hash["Updated"] = "Now"
+write-host("Add key-value")
+$hash.Add("Created","Now")
+write-host("print Size")
+$hash.Count
+write-host("Remove key-value")
+$hash.Remove("Updated")
+write-host("print Size")
+$hash.Count
+write-host("sort by key")
+$hash.GetEnumerator() | Sort-Object -Property key
+
+

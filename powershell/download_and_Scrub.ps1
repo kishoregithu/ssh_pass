@@ -13,38 +13,37 @@ Function Downloads{
         $Files = Get-ChildItem  $Location 
         $flag=$false
         if($Files.Length -gt 0){
-        Write-host "Downloading Files from the server" $ServerName
-        foreach ($item in $Files) 
-        { 
-            $filepath=$Location+'\'+$item
-            if ($item.LastWriteTime.Date -eq $DtFilesToGet)
-              {
-                  Copy-Item -Path $filepath -Destination $Path -Recurse
-                  #Write-Host "Copying... $File"
-                  $flag=$True
-              }
-              else 
-              {
-                  #Write-Host "$File Ignored"
-              }
+            Write-host "Downloading Files from the server" $ServerName
+            foreach ($item in $Files) 
+            { 
+                $filepath=$Location+'\'+$item
+                if ($item.LastWriteTime.Date -eq $DtFilesToGet)
+                  {
+                      Copy-Item -Path $filepath -Destination $Path -Recurse
+                      #Write-Host "Copying... $File"
+                      $flag=$True
+                  }
+                  else 
+                  {
+                      #Write-Host "$File Ignored"
+                  }
 
-        }
-        if($flag -eq $True){
-            FindandScrub $Path
-            $n = $Path.Split('\')
-            $foldertype = $n[10]
-            $servername = $n[5]
-            $pattern = '[\\/]'
-            $logdate=$DtFilesToGet.ToString('yyyy-MM-dd')
-            $zipname = $foldertype+$logdate+'.zip'
-            $zipname = $zipname -replace $pattern, ''
-            Compress-Archive -Path $Path -DestinationPath $Path\$zipname
-            UplodadToNexus $servername $zipname $Path
-        
-        }
-        }else{
-        Write-Host "No files to download"
-        }
+            }
+            if($flag -eq $True){
+                FindandScrub $Path
+                $n = $Path.Split('\')
+                $foldertype = $n[10]
+                $servername = $n[5]
+                $pattern = '[\\/]'
+                $logdate=$DtFilesToGet.ToString('yyyy-MM-dd')
+                $zipname = $foldertype+$logdate+'.zip'
+                $zipname = $zipname -replace $pattern, ''
+                Compress-Archive -Path $Path -DestinationPath $Path\$zipname
+                UplodadToNexus $servername $zipname $Path
+            }
+            }else{
+                Write-Host "No files to download"
+            }
         }
         #Copy-Item -Path $Location -Destination $Path -Recurse
     }catch{
@@ -67,13 +66,14 @@ Function UplodadToNexus{
     $username="YHVJrS-w"
     $password="Bz7xrO5MsAUrpXlTyty9cY41Al940NhwVLfb_yoIJnhl"
     $params = @{
-      UseBasicParsing = $true
-      Uri             = $publishUrl
-      Method          = "PUT"
-      InFile          = $packageName
-      Headers         = @{
-        ContentType   = "multipart/form-data"
-        Authorization = "Basic $([System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("$username`:$password")))" 
+        UseBasicParsing = $true
+        Uri             = $publishUrl
+        Method          = "PUT"
+        InFile          = $packageName
+        Headers         = @{
+            ContentType   = "multipart/form-data"
+            Authorization = "Basic $([System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("$username`:$password")))" 
+        }
     }
     Verbose         = $true
     try{

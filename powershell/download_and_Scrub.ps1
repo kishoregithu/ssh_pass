@@ -90,7 +90,7 @@ Function FindandScrub
     param (
         [String]$FilePath
     )
-    $regexs = @('(callid=)([a-zA-Z0-9]{5})([a-zA-Z0-9]{27})','(_ani=)([0-9]{5})([0-9]{5})','(ani.)([0-9]{5})([0-9]{5})')
+    $regexs = @("(callid=)([a-zA-Z0-9]{5})([a-zA-Z0-9]{27})", "(_ani=)([0-9]{5})([0-9]{5})", "(ani.)([0-9]{5})([0-9]{5})", "(_dnis=)([0-9]{5})([0-9]{5})", "(dnis.)([0-9]{5})([0-9]{5})", "(output\((VehicleIdentificationSerialNumber)\).)([a-zA-Z0-9]{6})([a-zA-Z0-9]{6})", "(SSN..)([0-9]{2})([0-9]{2})", "(accountNumber is* *)([0-9]{4})([0-9]{3})", "(accountNumber:,)([0-9]{4})([0-9]{3})", "([Aa]ccount *[Nn]umber is *:* )([0-9]{4})([0-9]{3})", "(sKey,)([0-9]{5})([0-9]{5})", "(ANI:::,)([0-9]{5})([0-9]{5})", "(output\((SSN)\).)([0-9]{2})([0-9]{2})", "(account[Nn]umber..)([0-9]{4})([0-9]{4})", "(account[Nn]umber..)([0-9]{5})([0-9]{4})", "(financeCode.)([0-9]{2})([0-9]{2})", "(value: )([a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4})(-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12})", "(ClientId\s.\s[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4})(-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12})", "(ClientSecret\s.\s.)([a-zA-Z0-9]{21})(_[a-zA-Z0-9]{5}-[a-zA-Z0-9]{11})")
     Get-ChildItem -Path $FilePath '*.txt' | ForEach-Object {
         $c = (Get-Content $_.FullName)
         foreach ($regex in $regexs) {

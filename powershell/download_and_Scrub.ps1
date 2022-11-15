@@ -18,16 +18,15 @@ Function Downloads{
             { 
                 $filepath=$Location+'\'+$item
                 if ($item.LastWriteTime.Date -eq $DtFilesToGet)
-                  {
-                      Copy-Item -Path $filepath -Destination $Path -Recurse
-                      #Write-Host "Copying... $File"
-                      $flag=$True
-                  }
-                  else 
-                  {
-                      #Write-Host "$File Ignored"
-                  }
-
+                {
+                  Copy-Item -Path $filepath -Destination $Path -Recurse
+                  #Write-Host "Copying... $File"
+                  $flag=$True
+                }
+                else 
+                {
+                  #Write-Host "$File Ignored"
+                }
             }
             if($flag -eq $True){
                 FindandScrub $Path
@@ -40,7 +39,6 @@ Function Downloads{
                 $zipname = $zipname -replace $pattern, ''
                 Compress-Archive -Path $Path -DestinationPath $Path\$zipname
                 UplodadToNexus $servername $zipname $Path
-            }
             }else{
                 Write-Host "No files to download"
             }
@@ -51,7 +49,6 @@ Function Downloads{
         Write-Host $_.
     }
     return
-    
 }
 
 Function UplodadToNexus{

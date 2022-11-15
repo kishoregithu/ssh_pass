@@ -16,7 +16,7 @@ Function Downloads{
         Write-host "Downloading Files from the server" $ServerName
         foreach ($item in $Files) 
         { 
-        $filepath=$Location+'\'+$item
+            $filepath=$Location+'\'+$item
             if ($item.LastWriteTime.Date -eq $DtFilesToGet)
               {
                   Copy-Item -Path $filepath -Destination $Path -Recurse
@@ -42,10 +42,10 @@ Function Downloads{
             UplodadToNexus $servername $zipname $Path
         
         }
-         }else{
-         Write-Host "No files to download"
-         }
-         }
+        }else{
+        Write-Host "No files to download"
+        }
+        }
         #Copy-Item -Path $Location -Destination $Path -Recurse
     }catch{
         Write-Error "Error while copying files from Remote Server" 
@@ -57,9 +57,9 @@ Function Downloads{
 
 Function UplodadToNexus{
     param(
-    [string]$servername,
-    [String]$uploadarchive,
-    [String]$folderloc
+        [string]$servername,
+        [String]$uploadarchive,
+        [String]$folderloc
     )
     cd $folderloc
     $packageName = $uploadarchive
@@ -74,9 +74,8 @@ Function UplodadToNexus{
       Headers         = @{
         ContentType   = "multipart/form-data"
         Authorization = "Basic $([System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("$username`:$password")))" 
-      }
-      Verbose         = $true
     }
+    Verbose         = $true
     try{
         $uplodstatus = Invoke-WebRequest @params
         Write-Host $uplodstatus
@@ -90,15 +89,14 @@ Function FindandScrub
 {
     param (
         [String]$FilePath
-       
     )
     $regexs = @('(callid=)([a-zA-Z0-9]{5})([a-zA-Z0-9]{27})','(_ani=)([0-9]{5})([0-9]{5})','(ani.)([0-9]{5})([0-9]{5})')
     Get-ChildItem -Path $FilePath '*.txt' | ForEach-Object {
-      $c = (Get-Content $_.FullName)
-      foreach ($regex in $regexs) {
-        $c = ($c) -replace $regex,'${1}*****$3' -join "`r`n"
-      }
-      [IO.File]::WriteAllText($_.FullName, $c)
+        $c = (Get-Content $_.FullName)
+        foreach ($regex in $regexs) {
+            $c = ($c) -replace $regex,'${1}*****$3' -join "`r`n"
+        }
+        [IO.File]::WriteAllText($_.FullName, $c)
     }
 }
 
@@ -108,28 +106,29 @@ $serverName = @("\\ito095622.hosts.cloud.ford.com\cisco$")
 $LocalPath = 'C:\Users\krompich\ford\test'
 $FoldersToCheck = "C:\Users\krompich\ford\test\*.txt"
 $FoldersToSearch = @("\CVP\VXMLServer\applications\FCNA_AUTH\logs\ActivityLog","\CVP\VXMLServer\applications\FCNA_Main_NLU\logs\ActivityLog","\CVP\VXMLServer\applications\FCNA_DisambigIntent_Voice\logs\ActivityLog")
+
 $serverName | ForEach {
     $serverName = $_
+    
     $FoldersToSearch | ForEach{
-
         $remotepath = $serverName+$_
         $netorkpath='filesystem::'+$remotepath
         Write-Host $netorkpath
          $checkpath=Test-Path $netorkpath
         
         if($checkpath){
-        $dirlocalPath = $LocalPath+$remotepath
-     
-        $checklocal = Test-Path -Path $dirlocalPath
-        $checklocal=$true
-        if($checklocal){
-           $newfolder= New-Item -Path $LocalPath -Name $remotepath -ItemType "directory" 
-           Downloads $remotepath $newfolder $serverName
-           write-host ('downloads finished')
+            $dirlocalPath = $LocalPath+$remotepath
+
+            $checklocal = Test-Path -Path $dirlocalPath
+            $checklocal=$true
+            if($checklocal){
+               $newfolder= New-Item -Path $LocalPath -Name $remotepath -ItemType "directory" 
+               Downloads $remotepath $newfolder $serverName
+               write-host ('downloads finished')
+            }
         }
         else{
             write-host("File exists")
-        }
         }
     }
 }

@@ -27,7 +27,7 @@ $regexs = @('(callid=)([a-zA-Z0-9]{5})([a-zA-Z0-9]{27})','(_ani=)([0-9]{5})([0-9
 Get-ChildItem -Path C:\temp\test\ '*.txt' | ForEach-Object {
   $c = (Get-Content $_.FullName)
   foreach ($regex in $regexs) {
-    $c = ($c) -replace $regex,'${1}*****$3'
+    $c = ($c) -replace $regex,'${1}*****$3' -join "`r`n"
   }
   [IO.File]::WriteAllText($_.FullName, $c)
 }

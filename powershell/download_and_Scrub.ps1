@@ -71,8 +71,8 @@ Function UplodadToNexus{
             ContentType   = "multipart/form-data"
             Authorization = "Basic $([System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("$username`:$password")))" 
         }
+        Verbose         = $true
     }
-    Verbose         = $true
     try{
         $uplodstatus = Invoke-WebRequest @params
         Write-Host $uplodstatus

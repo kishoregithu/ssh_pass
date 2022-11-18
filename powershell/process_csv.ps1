@@ -9,11 +9,11 @@ ForEach-Object {
     $csv_data | ForEach-Object {
         $bf_test =  ($des_dev_list.contains($_.destDeviceName))
         if ($_.lastRedirectDn -match $regex_ax -or $bf_test) {
-            $_.callingPartyNumber="***********"
+            $_.callingPartyNumber='*' * $_.callingPartyNumber.length 
         }
         if ($_.originalCalledPartyNumberPartition -match $regex_az -or $_.finalCalledPartyNumberPartition -match $regex_az) {
-            $_.originalCalledPartyNumber="***********"
-            $_.finalCalledPartyNumber="***********"
+            $_.originalCalledPartyNumber='*' * $_.originalCalledPartyNumber.length 
+            $_.finalCalledPartyNumber='*' * $_.finalCalledPartyNumber.length 
         }
         $_
     } | Export-Csv $filePath -NoTypeInformation
